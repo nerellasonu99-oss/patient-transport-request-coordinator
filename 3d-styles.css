@@ -1,0 +1,550 @@
+/**
+ * CareRoute — Apple-quality overlay theme
+ * Clean, dark, typographic. No overuse of neon. Subtle glow. Perfect spacing.
+ */
+
+:root {
+  color-scheme: dark;
+
+  /* Palette — restrained, like Apple Dark */
+  --ink:        #e8f2f1;
+  --ink-2:      #b0c4c8;
+  --muted:      #6a8a90;
+  --line:       rgba(255,255,255,0.08);
+  --line-teal:  rgba(62,224,200,0.14);
+  --paper:      rgba(10,18,24,0.6);
+  --canvas:     #060e16;
+
+  /* Accent — single teal, used sparingly */
+  --teal:       #2fd8c0;
+  --teal-dark:  #1aaa96;
+  --teal-glow:  rgba(47,216,192,0.22);
+
+  /* Surfaces */
+  --glass:        rgba(10,20,28,0.55);
+  --glass-strong: rgba(6,14,22,0.78);
+  --glass-light:  rgba(255,255,255,0.038);
+
+  /* Shadow */
+  --shadow-sm: 0 2px 10px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 32px rgba(0,0,0,0.42);
+  --shadow-lg: 0 20px 56px rgba(0,0,0,0.55);
+}
+
+html, body {
+  min-height: 100%;
+  background: var(--canvas);
+  color: var(--ink);
+}
+
+body {
+  position: relative;
+  isolation: isolate;
+}
+
+/* ── Three.js Canvas ──────────────────────────────────────────────────────── */
+.scene-3d {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.scene-3d canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Stacking ─────────────────────────────────────────────────────────────── */
+.topbar   { position: relative; z-index: 100; }
+.page-shell { position: relative; z-index: 1; }
+
+/* ── Top Bar ─────────────────────────────────────────────────────────────── */
+.topbar {
+  /* Apple nav bar: frosted glass, ultra-thin border */
+  border-bottom: 1px solid var(--line);
+  background: rgba(6, 12, 18, 0.78);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+}
+
+/* ── Brand ───────────────────────────────────────────────────────────────── */
+.brand, h1, h2, .page-intro, .eyebrow,
+.result-count, .form-intro, .page-footer, .view-picker {
+  color: var(--ink);
+}
+
+.brand-subtitle, .page-intro, .result-count,
+.form-intro, .page-footer, .view-picker { color: var(--ink-2); }
+
+.brand-mark {
+  border-color: rgba(47,216,192,0.25);
+  background: linear-gradient(145deg, #22c4ae, #0d7068);
+  box-shadow: 0 0 0 1px rgba(47,216,192,0.1), 0 4px 16px rgba(0,0,0,0.4);
+}
+
+/* ── Eyebrow — Apple uses ALL CAPS tight tracking ─────────────────────────── */
+.eyebrow {
+  color: var(--teal);
+  letter-spacing: 1.8px;
+  /* Subtle glow — not blinding */
+  text-shadow: 0 0 24px rgba(47,216,192,0.28);
+}
+
+/* ── Inputs ───────────────────────────────────────────────────────────────── */
+.view-picker select,
+.filter-field select,
+.search-field,
+.form-field input,
+.form-field select,
+.form-field textarea,
+.assignment-controls select,
+.driver-status-select {
+  border-color: var(--line);
+  background-color: rgba(4,10,16,0.65);
+  color: var(--ink);
+  color-scheme: dark;
+}
+
+select option          { background-color: #0a1620; color: var(--ink); }
+select option:checked  { background-color: #0e3838; color: #d0f0ec; }
+
+/* Focus ring — Apple uses a clean blue/teal ring */
+.search-field:focus-within,
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus,
+.filter-field select:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(47,216,192,0.14);
+  outline: none;
+}
+
+.search-field {
+  color: var(--ink-2);
+  background: rgba(4,10,16,0.5);
+}
+.search-field input  { color: var(--ink); background: transparent; }
+.search-field:focus-within { background: rgba(8,18,28,0.75); }
+
+.form-field input::placeholder, .form-field textarea::placeholder { color: #4a6a70; }
+.form-field label { color: #a8c4c8; }
+
+/* ── Today chip ───────────────────────────────────────────────────────────── */
+.today-chip {
+  border: 1px solid var(--line);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--ink-2);
+  box-shadow: var(--shadow-sm);
+}
+.today-dot {
+  background: var(--teal);
+  box-shadow: 0 0 0 4px rgba(47,216,192,0.14);
+}
+
+/* ── Cards / Panels ──────────────────────────────────────────────────────── */
+.today-chip,
+.summary-card,
+.panel,
+.request-card,
+.notice,
+.empty-state {
+  border: 1px solid var(--line);
+  background: var(--glass);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  /* Single clean shadow — like Apple's SF UI surfaces */
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.055);
+}
+
+.summary-card {
+  background: linear-gradient(160deg, rgba(18,40,46,0.42), var(--glass));
+}
+.summary-card p   { color: var(--muted); }
+.summary-card:hover {
+  /* Lift and very faint teal border — not neon, just aware */
+  border-color: rgba(47,216,192,0.22);
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(47,216,192,0.1);
+}
+
+/* ── Summary icons ──────────────────────────────────────────────────────── */
+.summary-icon, .form-symbol {
+  background: rgba(47,216,192,0.1);
+  color: var(--teal);
+  box-shadow: none; /* remove neon glow on icons */
+}
+.summary-active   .summary-icon { background: rgba(80,130,220,0.14); color: #88b4f0; }
+.summary-completed .summary-icon { background: rgba(47,216,192,0.14); color: var(--teal); }
+.summary-today    .summary-icon { background: rgba(220,180,80,0.14);  color: #d4a84a; }
+
+/* ── Form panel ─────────────────────────────────────────────────────────── */
+.form-panel {
+  background: linear-gradient(180deg, rgba(14,36,40,0.46) 0, var(--glass-strong) 180px);
+}
+.form-symbol { background: rgba(47,216,192,0.1); color: var(--teal); }
+
+/* ── Request cards ──────────────────────────────────────────────────────── */
+.request-card { background: rgba(8,18,26,0.52); }
+.request-card:hover {
+  border-color: rgba(47,216,192,0.2);
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(47,216,192,0.08);
+}
+
+.request-reference, .route-label { color: var(--ink); }
+.request-datetime, .route-label small,
+.request-meta, .request-history,
+.history-list time, .driver-status-controls { color: var(--muted); }
+
+/* ── Status badges ──────────────────────────────────────────────────────── */
+.status-badge { background: rgba(255,255,255,0.05); color: #aabbc0; }
+.status-requested  { background: rgba(140,100,20,0.22);  color: #d4b060; }
+.status-confirmed  { background: rgba(60,110,180,0.22);  color: #88b2ee; }
+.status-in-transit { background: rgba(100,70,170,0.22);  color: #b8a0e8; }
+.status-completed  { background: rgba(35,110,80,0.22);   color: #72d0a8; }
+.status-cancelled  { background: rgba(140,50,50,0.22);   color: #e09090; }
+
+/* ── Route ──────────────────────────────────────────────────────────────── */
+.route-track::before { background: rgba(255,255,255,0.08); }
+.route-point { background: #0b141c; border-color: var(--teal); }
+
+/* ── Meta chips ─────────────────────────────────────────────────────────── */
+.meta-chip {
+  border-color: var(--line);
+  background: rgba(255,255,255,0.03);
+}
+
+/* ── History ────────────────────────────────────────────────────────────── */
+.request-history summary { color: var(--teal); }
+.history-list li { border-left-color: rgba(47,216,192,0.3); }
+.request-meta { border-top-color: var(--line); }
+.driver-status-controls { border-top-color: var(--line); }
+
+/* ── Primary button — Apple CTA style ──────────────────────────────────── */
+.primary-button {
+  /* Clean gradient, not over-glowing */
+  background: linear-gradient(135deg, #24cbb4, #0f7a72);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset,
+              0 6px 20px rgba(0,0,0,0.35),
+              0 0 0 1px rgba(0,0,0,0.3);
+  letter-spacing: 0.1px;
+}
+.primary-button:hover {
+  background: linear-gradient(135deg, #2cd8c0, #148a80);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.14) inset,
+              0 8px 24px rgba(0,0,0,0.42);
+  transform: translateY(-1px);
+}
+.primary-button:active { transform: translateY(0.5px); }
+
+/* ── Empty state ────────────────────────────────────────────────────────── */
+.empty-state {
+  border-style: dashed;
+  background: rgba(8,18,26,0.4);
+  border-color: var(--line);
+}
+.empty-icon { background: rgba(47,216,192,0.08); color: var(--teal); }
+.empty-state h3 { color: var(--ink); }
+.empty-state p  { color: var(--muted); }
+
+/* ── Notices ────────────────────────────────────────────────────────────── */
+.notice {
+  border-color: rgba(47,216,192,0.25);
+  background: rgba(16,56,48,0.4);
+  color: #9adcca;
+}
+.notice.notice-error {
+  border-color: rgba(220,80,80,0.28);
+  background: rgba(70,20,20,0.42);
+  color: #e8a0a0;
+}
+
+/* ── Focus rings ────────────────────────────────────────────────────────── */
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgba(47,216,192,0.5);
+  outline-offset: 2px;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   3D TILT / PERSPECTIVE — Apple uses VERY subtle tilt
+   ════════════════════════════════════════════════════════════════════════════ */
+.summary-grid, .schedule-list { perspective: 1200px; }
+
+.summary-card, .request-card, .primary-button {
+  transform-style: preserve-3d;
+  /* Smooth, not springy */
+  transition:
+    transform   0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+    box-shadow  0.5s cubic-bezier(0.25, 0.1, 0.25, 1),
+    border-color 0.4s ease,
+    background  0.4s ease;
+  will-change: transform;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px) rotateX(3deg) rotateY(-2deg);
+}
+.request-card:hover {
+  transform: translateY(-3px) rotateX(2deg);
+}
+.primary-button:hover {
+  transform: translateY(-2px) rotateX(4deg);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PAGE-LOAD ANIMATIONS — Apple style: fade + blur reveal, no bouncing
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Page heading */
+.page-heading {
+  animation: apple-rise 1s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+  animation-delay: 0.1s;
+}
+
+/* Summary grid stagger */
+.summary-card:nth-child(1) { animation: apple-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) 0.18s both; }
+.summary-card:nth-child(2) { animation: apple-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) 0.26s both; }
+.summary-card:nth-child(3) { animation: apple-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) 0.34s both; }
+.summary-card:nth-child(4) { animation: apple-rise 0.9s cubic-bezier(0.25,0.1,0.25,1) 0.42s both; }
+
+/* Workspace panels */
+.request-panel { animation: apple-rise 1s cubic-bezier(0.25,0.1,0.25,1) 0.3s both; }
+.form-panel    { animation: apple-rise 1s cubic-bezier(0.25,0.1,0.25,1) 0.42s both; }
+.page-footer   { animation: apple-rise 1s cubic-bezier(0.25,0.1,0.25,1) 0.52s both; }
+
+@keyframes apple-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: blur(0);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CUSTOM 3D DROPDOWN — view-picker
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.view-picker-3d {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  height: 44px;
+  padding: 5px 11px 5px 13px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: rgba(6,12,18,0.72);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.055);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  cursor: pointer;
+  user-select: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  transition:
+    border-color 0.3s ease,
+    box-shadow   0.3s ease,
+    transform    0.35s cubic-bezier(0.25,0.1,0.25,1);
+  perspective: 800px;
+  transform-style: preserve-3d;
+}
+
+.view-picker-3d:hover,
+.view-picker-3d[aria-expanded="true"] {
+  border-color: rgba(47,216,192,0.32);
+  box-shadow: var(--shadow-md), 0 0 0 1px rgba(47,216,192,0.08);
+}
+
+.view-picker-3d:focus-visible {
+  outline: 2px solid rgba(47,216,192,0.5);
+  outline-offset: 2px;
+}
+
+.view-picker-label {
+  flex: 1;
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.05px;
+}
+
+.view-picker-chevron {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  color: rgba(47,216,192,0.5);
+  transition: transform 0.35s cubic-bezier(0.25,0.1,0.25,1), color 0.25s;
+}
+.view-picker-3d[aria-expanded="true"] .view-picker-chevron {
+  transform: rotate(180deg);
+  color: var(--teal);
+}
+
+/* ── Dropdown Panel ─────────────────────────────────────────────────────── */
+/* Panel is teleported to <body> so position:fixed is clean (no transform parent) */
+.vp3d-panel {
+  position: fixed;
+  min-width: 220px;
+  z-index: 999999;
+  transform-origin: top left;
+  transform: perspective(600px) rotateX(-12deg) scaleY(0.88) translateY(-6px);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform 0.32s cubic-bezier(0.25,0.1,0.25,1),
+    opacity   0.22s ease;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  background: rgb(6,14,22);
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.85),
+    0 0 0 1px rgba(255,255,255,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+.vp3d-panel.vp3d-open {
+  transform: perspective(600px) rotateX(0deg) scaleY(1) translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.vp3d-inner { padding: 6px; }
+
+/* ── Option items ───────────────────────────────────────────────────────── */
+.vp3d-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.05px;
+  transition:
+    background  0.2s ease,
+    color       0.2s ease,
+    opacity     0.22s ease,
+    transform   0.28s cubic-bezier(0.25,0.1,0.25,1);
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+/* Panel is in <body> now — use .vp3d-open on the panel itself */
+.vp3d-panel.vp3d-open .vp3d-option {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.vp3d-option:hover {
+  background: rgba(255,255,255,0.055);
+  color: var(--ink);
+  transform: translateX(2px) !important;
+}
+
+.vp3d-option.vp3d-active {
+  background: rgba(47,216,192,0.1);
+  color: var(--teal);
+}
+
+.vp3d-option-dot {
+  width: 6px; height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: rgba(47,216,192,0.2);
+  border: 1.5px solid rgba(47,216,192,0.3);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.vp3d-option.vp3d-active .vp3d-option-dot {
+  background: var(--teal);
+  box-shadow: 0 0 6px rgba(47,216,192,0.6);
+  border-color: var(--teal);
+}
+
+.vp3d-divider {
+  height: 1px;
+  margin: 5px 8px;
+  background: var(--line);
+}
+
+/* Neon top-edge line — single pixel, like a highlight */
+.vp3d-panel::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 15%; right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(47,216,192,0.4), transparent);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   VIEW-ROLE ICON
+   ════════════════════════════════════════════════════════════════════════════ */
+.view-role-icon {
+  display: grid;
+  width: 28px; height: 28px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(47,216,192,0.2);
+  border-radius: 9px;
+  background: rgba(47,216,192,0.1);
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   MOBILE — no Three.js, clean ambient gradients (Apple uses CSS bg on mobile)
+   ════════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 700px) {
+  .scene-3d { display: none; }
+
+  body {
+    /* Clean, Apple-style dark gradient — no flashy colors */
+    background:
+      radial-gradient(ellipse 100% 55% at 50% -5%, rgba(30,70,80,0.55), transparent 65%),
+      radial-gradient(ellipse 60% 40% at 10% 90%, rgba(14,50,60,0.4), transparent 55%),
+      var(--canvas);
+  }
+
+  .form-panel { position: static; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   REDUCED MOTION
+   ════════════════════════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  .page-heading,
+  .summary-card,
+  .request-panel,
+  .form-panel,
+  .page-footer,
+  .summary-card,
+  .request-card,
+  .primary-button {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+  .summary-card:hover,
+  .request-card:hover,
+  .primary-button:hover {
+    transform: none !important;
+  }
+}

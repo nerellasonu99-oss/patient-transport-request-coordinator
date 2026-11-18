@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#071018">
+  <title>Patient Transport Request Coordinator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="3d-styles.css">
+  <script src="app.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js" defer></script>
+  <script src="3d-scene.js" defer></script>
+</head>
+<body>
+  <div id="scene-3d" class="scene-3d" aria-hidden="true"></div>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#" aria-label="Patient Transport Request Coordinator home">
+        <span class="brand-mark" aria-hidden="true">PT</span>
+        <span>CareRoute <span class="brand-subtitle">Transport coordination</span></span>
+      </a>
+      <!-- Custom 3D dropdown replaces native select -->
+      <div class="view-picker view-picker-3d" id="view-picker-3d" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Choose a view" tabindex="0">
+        <span>View as</span>
+        <span class="view-role-icon" id="view-role-icon" aria-hidden="true">D</span>
+        <span class="view-picker-label" id="view-picker-label">Dispatcher</span>
+        <span class="view-picker-chevron" aria-hidden="true">
+          <svg width="11" height="7" viewBox="0 0 11 7" fill="none"><path d="M1 1l4.5 4.5L10 1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+        <!-- Hidden native select for form/JS compatibility -->
+        <select id="view-select" aria-label="Choose a view" aria-hidden="true" tabindex="-1" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;">
+          <option value="dispatcher">Dispatcher</option>
+        </select>
+        <!-- 3D Dropdown panel -->
+        <div class="vp3d-panel" id="vp3d-panel" role="listbox" aria-label="Choose a view">
+          <div class="vp3d-inner">
+            <!-- Options injected by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-shell">
+    <section class="page-heading" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">TRANSPORT OPERATIONS</p>
+        <h1 id="page-title">Patient transport requests</h1>
+        <p class="page-intro">Coordinate non-emergency journeys and keep everyone on the same route.</p>
+      </div>
+      <p class="today-chip"><span class="today-dot" aria-hidden="true"></span><span id="today-date"></span></p>
+    </section>
+
+    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+
+    <section class="summary-grid" aria-label="Request summary">
+      <article class="summary-card summary-total">
+        <span class="summary-icon" aria-hidden="true">▤</span>
+        <div><p>All requests</p><strong id="count-all">0</strong></div>
+      </article>
+      <article class="summary-card summary-active">
+        <span class="summary-icon" aria-hidden="true">↗</span>
+        <div><p>Active requests</p><strong id="count-active">0</strong></div>
+      </article>
+      <article class="summary-card summary-completed">
+        <span class="summary-icon" aria-hidden="true">✓</span>
+        <div><p>Completed</p><strong id="count-completed">0</strong></div>
+      </article>
+      <article class="summary-card summary-today">
+        <span class="summary-icon" aria-hidden="true">▣</span>
+        <div><p>Scheduled today</p><strong id="count-today">0</strong></div>
+      </article>
+    </section>
+
+    <div class="workspace-grid">
+      <section class="panel request-panel" aria-labelledby="schedule-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">LIVE OVERVIEW</p>
+            <h2 id="schedule-heading" tabindex="-1">Request schedule</h2>
+          </div>
+          <span id="visible-count" class="result-count"></span>
+        </div>
+
+        <div class="filters">
+          <label class="search-field" for="search-input">
+            <span class="sr-only">Search requests</span>
+            <span aria-hidden="true">⌕</span>
+            <input id="search-input" type="search" placeholder="Search reference or location">
+          </label>
+          <label class="filter-field" for="status-filter">
+            <span class="sr-only">Filter by status</span>
+            <select id="status-filter">
+              <option value="all">All statuses</option>
+              <option>Requested</option>
+              <option>Confirmed</option>
+              <option>In transit</option>
+              <option>Completed</option>
+              <option>Cancelled</option>
+            </select>
+          </label>
+        </div>
+        <div id="schedule" class="schedule-list"></div>
+      </section>
+
+      <aside class="panel form-panel" aria-labelledby="form-heading">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">NEW JOURNEY</p>
+            <h2 id="form-heading">Create a request</h2>
+          </div>
+          <span class="form-symbol" aria-hidden="true">＋</span>
+        </div>
+        <p class="form-intro">Use a patient reference only. Do not enter names or other sensitive personal details.</p>
+        <form id="request-form">
+          <div class="form-field">
+            <label for="patient-reference">Patient reference <span class="required-mark">*</span></label>
+            <input id="patient-reference" name="patientReference" type="text" placeholder="e.g. PT-1042" maxlength="24" required>
+          </div>
+          <div class="form-field">
+            <label for="pickup-location">Pickup location <span class="required-mark">*</span></label>
+            <input id="pickup-location" name="pickup" type="text" placeholder="e.g. North Clinic, Main Entrance" maxlength="80" required>
+          </div>
+          <div class="form-field">
+            <label for="dropoff-location">Drop-off location <span class="required-mark">*</span></label>
+            <input id="dropoff-location" name="dropoff" type="text" placeholder="e.g. Riverside Health Centre" maxlength="80" required>
+          </div>
+          <div class="form-row">
+            <div class="form-field">
+              <label for="travel-date">Travel date <span class="required-mark">*</span></label>
+              <input id="travel-date" name="date" type="date" required>
+            </div>
+            <div class="form-field">
+              <label for="pickup-time">Pickup time <span class="required-mark">*</span></label>
+              <input id="pickup-time" name="time" type="time" required>
+            </div>
+          </div>
+          <div class="form-field">
+            <label for="mobility-support">Mobility support <span class="required-mark">*</span></label>
+            <select id="mobility-support" name="mobility" required>
+              <option value="">Select support</option>
+              <option>Independent</option>
+              <option>Wheelchair</option>
+              <option>Walking assistance</option>
+              <option>Stretcher</option>
+              <option>Other assistance</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="transport-notes">Transport notes <span class="optional-label">Optional</span></label>
+            <textarea id="transport-notes" name="notes" rows="3" maxlength="240" placeholder="Practical transport details only"></textarea>
+          </div>
+          <button class="primary-button submit-button" type="submit">Add transport request <span aria-hidden="true">→</span></button>
+        </form>
+      </aside>
+    </div>
+    <footer class="page-footer">For non-emergency transport coordination only. This demo stores information in this browser.</footer>
+  </main>
+</body>
+</html>
